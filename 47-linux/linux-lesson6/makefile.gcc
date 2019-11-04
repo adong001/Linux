@@ -1,0 +1,38 @@
+#[目标对象：要生成的可执行程序或者动态库或者静态库]:[依赖对象]
+#	[执行的命令]gcc a.c -o a
+#	$@:[目标对象] $^:[所有的依赖的对象] $<:[第一个依赖的对象]
+#a:a.o
+#	gcc a.c -o a
+#a.o:a.c
+#	gcc -c a.c -o a.o
+#
+#a:a.c
+#	gcc a.c b.c -o a
+#
+#a:a.c b.c
+#	gcc $^ -o $@
+
+#src=$(wildcard *.c)
+#$(warning $(src))
+#obj=$(patsubst %.c, %.o, $(src))
+#$(warning $(obj))
+#
+#bin=aa
+##Include=-I[path]
+#CFLAGS=-c
+#
+#ifdef _DEBUG
+#CFLAGS=-g -c
+#endif
+#$(bin):$(obj)
+#	gcc $^ -o $@
+#%.o:%.c
+#	gcc $(CFLAGS) $< -o $@ 
+#clean:
+#	rm $(bin) $(obj)
+
+#.PHONY:aa
+#aa:a.c
+#	gcc a.c -o aa
+
+include makefile.inc
