@@ -1,0 +1,1 @@
+/home/test/.VimForCpp/vim/init.vim
