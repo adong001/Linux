@@ -1,1 +1,0 @@
-/home/test/.VimForCpp/ycm_extra_conf.py

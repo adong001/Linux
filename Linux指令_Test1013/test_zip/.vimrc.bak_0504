@@ -1,2 +1,0 @@
-set nu
-imap jk <esc>:w<cr>
