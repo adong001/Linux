@@ -14,7 +14,7 @@ int main(int argc,char* argv[])
     }
     //execl("/usr/bin/ls","ls","-l",NULL);
     //execlp("myenv","myenv","-l",NULL);
-    execle("./myenv","myenv","-l",NULL,env);
+    execle("./test","./test",NULL,env);
     printf("hello\n");
     return 0;
 }
