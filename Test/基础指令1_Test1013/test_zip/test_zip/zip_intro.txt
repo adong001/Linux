@@ -1,0 +1,23 @@
+1、压缩文件
+    (1)zip压缩
+        ---zip [压缩后的文件名] [待压缩的文件名]
+        ---unzip [带解压的文件名]
+    (2)tar压缩
+       (2.1)gzip
+        ---tar -zcvf [压缩后的文件名].gz [待压缩的文件名]
+        ---tar -zxvf [带解压缩的文件名]
+       (2.2)bzip2
+        ---tar -jcvf [压缩后的文件名].bz2 [待压缩的文件名]
+        ---tar -jxvf [带解压缩的文件名]
+
+2、传输文件
+    (1) rz ---将windows文件传输到Linux下
+    (2) sz ---将Linux文件传输到Windows下
+    (3) xftp ---(xshell提供的上传下载文件插件)
+
+test3 :(1)将上级目录的test_chmod用zip压缩到成test文件传到Windows桌面
+       (2)将上级目录的test_zip用gzip压缩成test2文件
+       (3)将test文件用bzip2方式解压
+
+
+

@@ -1,0 +1,53 @@
+权限命令介绍：
+
+1、修改权限：
+    chmid u(当前用户)/g(同组用户)/o(其他用户)+/-r(可读)/w(可写)/x(可执行)  
+    ---rwx可用三个8进制数代替例如766(当前用户可读可写可执行,组内用户可读可写,其他用户可读可写)
+
+2、粘滞位:
+   chmod +/- t [catalogname] (目录名，只能针对目录) 
+    通常情况下只要用户对某个目录具备w写入权限，便可删除该目录中的任意文件，而不论这个文件的权限是什么。
+    比如我们进行以下操作：
+    #创建/test目录，并赋予777权限.
+    #以root用户的身份在 /test 目录下创建 file1 文件,并查看其默认权限.
+    #以普通用户身份登录系统可以删除 /test/file1.
+    可以发现，虽然普通用户对于文件file1只有r权限，但因为从/test目录中获得了rxw权限，因而仍然可以将文件/test/file1删除.
+    在Linux环境下比较典型的例子就是/tmp, /var/tmp目录，这两个目录作为Linux的临时文件夹，权限为rwxrwxrwx,即允许任意用户任意程序在该目录下进行创建删除，移动文件或子目录等操作。然而，若任意一个用户都能任意删除系统服务运行中的临时文件，将造成多大的后果.
+    粘滞位权限就是针对此类情况设置，当目录被设置了粘滞位权限之后，即便用户对该目录具有写入权限，也不能删除该目录下其他用户的文件数据，而是只有该文件数据的所有者和root才有权限删除.设置里粘滞位之后，可以保持一种动态的平衡，允许用户在该目录下任意写入，删除数据，但是禁止删除其他用户的数据.
+    需要注意的是粘滞位只能对目录设置，对文件无效.
+
+3、修改文件权限
+     chown [username] [filename] 
+     ---将filename文件的文件拥有者修改为username
+     
+     chgrp [username] [filename] 
+     ---将filename文件的文件所有组修改为username (两个命令都是在root权限下操作)
+
+    uname -a 
+    ---查看操作系统位数，版本信息等
+    ---Linux bogon 3.10.0-514.el7.x86_64 #1 SMP Tue Nov 22 16:42:41 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux-
+
+    ulimit -a 
+    ---查看系统参数值
+    core file size          (blocks, -c) 0
+    data seg size           (kbytes, -d) unlimited
+    scheduling priority             (-e) 0
+    file size               (blocks, -f) unlimited
+    pending signals                 (-i) 7170
+    max locked memory       (kbytes, -l) 64
+    max memory size         (kbytes, -m) unlimited
+    open files                      (-n) 1024
+    pipe size            (512 bytes, -p) 8
+    POSIX message queues     (bytes, -q) 819200
+    real-time priority              (-r) 0
+    stack size              (kbytes, -s) 8192
+    cpu time               (seconds, -t) unlimited
+    max user processes              (-u) 4096
+    virtual memory          (kbytes, -v) unlimited
+    file locks                      (-x) unlimited
+
+    umask 
+    ---查看系统默认权限掩码
+    ---创建文件时，文件默认权限 = 0777 & ~系统默认掩码
+    umask [四位8进制数] 
+    ---修改系统默认权限掩码(一般是0002)

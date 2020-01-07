@@ -1,0 +1,14 @@
+此文件权限为rw--rw--r--(664)
+
+修改文件权限为 r--r-x-rw-(656):
+
+1.
+    chmod g -w test1.txt
+    chmod g +x test1.txt
+    chmod o +w test1.txt
+
+2.chmod test1.txt 656
+
+
+
+
