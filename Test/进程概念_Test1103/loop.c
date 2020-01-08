@@ -5,7 +5,7 @@
 
 int main()
 {
-     printf("******************\n");
+    printf("******************\n");
     pid_t pid = fork();
     uint64_t i = 0;
     while(1)

@@ -1,3 +1,4 @@
+#.PHONY:men env orphan zombie loop
 men:men.c
 	gcc $^ -o $@ 
 env:env.c
