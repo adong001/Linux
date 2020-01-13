@@ -18,7 +18,8 @@ int main()
     else if(pid > 0)
     {
         printf("父进程[%d]\n",getpid());
-        exit(0);
+        sleep(5);
+        exit(0);//父进程先于子进程退出,子进程变成孤儿进程
     }
           
 

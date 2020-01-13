@@ -1,8 +1,9 @@
+PHONY:minishell
+exec:exec.c
+	gcc $^ -o $@
 minishell:minishell.c
 	gcc $^ -o $@
 test:test.c
-	gcc $^ -o $@
-exec:exec.c
 	gcc $^ -o $@
 wait:wait.c
 	gcc $^ -o $@
