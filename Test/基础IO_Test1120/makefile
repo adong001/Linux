@@ -1,5 +1,9 @@
+std-sys:std-sys.c
+	gcc $^ -o $@
+std:std.c
+	gcc $^ -o $@
 sysio:sysio.c
 	gcc $^ -o $@
-write:write.c
+library:library.c
 	gcc $^ -o $@
 
