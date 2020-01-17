@@ -14,11 +14,12 @@ void sigcb(int signum)
 }
 int main()
 {
-    signal(SIGCHLD,sigcb);
+    signal(SIGCHLD,sigcb);//将信号SIGCHLD自定义为sigcb
+
     pid_t pid = fork();
     if(pid == 0)
     {
-        sleep(5);
+        sleep(5);//子进程退出,产生僵尸进程
         exit(0);
     }
     
@@ -35,7 +36,7 @@ int main()
     {
     
         sleep(1);
-        printf("打麻将~~~\n");
+        printf("this is parent\n");
     }
     return 0;
 }
