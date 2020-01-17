@@ -12,15 +12,15 @@ int main()
 {
     signal(2,sigcb);
     signal(40,sigcb);
-    //阻塞所有信号
-    sigset_t set,old;
 
+    sigset_t set,old;
     sigemptyset(&set);//清空信号集合
     sigemptyset(&old);
 
     
     //sigaddset(int signum,sigset_t *set);将指定自信号添加到集合
     sigfillset(&set);//将所有的信号添加到set集合中来
+
     sigprocmask(SIG_BLOCK,&set,&old);//阻塞所有信号
 
     printf("press enter to continue\n");

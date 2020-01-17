@@ -27,7 +27,7 @@ int main()
     int i = 0;
     while(1)
     {
-        sprintf(shmstart,"%s-%d","share memory",i++);//将数据打印到虚拟地址空间映射的物理内存中
+        sprintf(shmstart,"%s-%d\n","share memory",i++);//将数据打印到虚拟地址空间映射的物理内存中
         sleep(1);
     }
     shmdt(shmstart);//解除映射

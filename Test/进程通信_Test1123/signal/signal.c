@@ -11,8 +11,8 @@ void sigcb(int signum)
 int main()
 {
     //sighandle_t signal(int signum,sighandler_t handler);
-    signal(SIGINT,sigcb);
-    signal(SIGQUIT,SIG_IGN);
+  //  signal(SIGINT,sigcb);
+    signal(SIGINT,SIG_IGN);//忽略处理
 
     while(1)
     {

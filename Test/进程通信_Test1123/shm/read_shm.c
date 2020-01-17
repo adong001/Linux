@@ -26,7 +26,7 @@ int main()
     while(1)
     {
         printf("%s",shmstart);//将共享内存中的数据打印到屏幕上
-        sleep(1);
+       // sleep(1);
     }
     shmdt(shmstart);//解除映射
     shmctl(shmid,IPC_RMID,NULL);//IPC_RMID--删除共享内存
