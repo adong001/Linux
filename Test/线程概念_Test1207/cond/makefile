@@ -1,3 +1,5 @@
+cond:cond.c
+	gcc $^ -o  $@ -lpthread
 sem_pro_con:sem_pro_con.cpp
 	g++ $^ -o  $@ -lpthread
 test:test.cpp
