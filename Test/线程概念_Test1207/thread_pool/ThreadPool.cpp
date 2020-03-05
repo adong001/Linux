@@ -15,15 +15,14 @@ class ThreadTask
 {
 //线程池中的线程只需要一个TreadTask任务，然后调用Run接口就能完成任务处理
     private:
-        int m_data;
-        task_handler_t m_handler;
+        int m_data;//用户传入的数据
+        task_handler_t m_handler;//用户传入处理数据的方法
     public:
-        ThreadTask(int data,task_handler_t handler):
+        ThreadTask(int data,task_handler_t handler)://构造函数
             m_data(data),
             m_handler(handler)
     {}
-    ~ThreadTask()
-     {}
+
     void Run()
     {
         return m_handler(m_data);
@@ -70,7 +69,7 @@ class ThreadPool
             for(int i = 0;i < m_thread_count;i++)
             {
                 pthread_t tid;
-                int ret = pthread_creat(&tid,NULL,thread_start,(void*)this);
+                int ret = pthread_create(&tid,NULL,thread_start,(void*)this);
                 if(!ret)
                 {
                     cout<<"creat thread error\n";
@@ -120,6 +119,10 @@ int main()
     {
         ThreadTask task(i,test);
         tp.PushTask(task);
+    }
+    while(1)
+    {
+        sleep(1);
     }
     return 0;
 }
