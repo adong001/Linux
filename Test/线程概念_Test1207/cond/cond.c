@@ -12,13 +12,13 @@ void* MakeFoods(void* foods)//做食物
     while(1)
     {
         pthread_mutex_lock(&mutex);//要做饭了,先加锁,防止顾客进来
-        while((*(int*)foods) <= 5)
+        while((*(int*)foods) >= 5)
         {
             //若做好食物,但没人吃,则陷入等待
             pthread_cond_wait(&cond_chief,&mutex);
         }
-        printf("make a bowl of foods\n");
         (*(int*)foods)++;//做了一碗饭,饭的数量++
+        printf("make a bowl of foods:%d\n",*(int*)foods);
         pthread_mutex_unlock(&mutex);//做完饭解锁,
         pthread_cond_signal(&cond_customer);//做好食物唤醒等待的顾客
     }
@@ -35,10 +35,10 @@ void* EatFoods(void* foods)//吃食物
             //并且解锁操作和陷入休眠操作必须是原子操作
             pthread_cond_wait(&cond_customer,&mutex);
         }
-        printf("吃饭~~~\n");
         (*(int*)foods)--;
+        printf("吃饭~~~,还有%d碗饭\n",*(int*)foods);
         pthread_mutex_unlock(&mutex);
-        pthread_cond_signal(&cond_chief);
+        pthread_cond_signal(&cond_chief);//吃完一碗饭，就可以唤醒厨师再做一碗了
     }
     return NULL;
 }
@@ -54,7 +54,7 @@ int main()
     pthread_mutex_init(&mutex,NULL);//初始化互斥锁
 
     for(i = 0;i < 4;i++)
-        {
+    {
         ret = pthread_create(&thread_chief, NULL, MakeFoods,(void*)(&foods));//创建厨师线程
         if(ret != 0)
         {
