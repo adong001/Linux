@@ -70,7 +70,7 @@ class ThreadPool
             {
                 pthread_t tid;
                 int ret = pthread_create(&tid,NULL,thread_start,(void*)this);
-                if(!ret)
+                if(ret != 0)
                 {
                     cout<<"creat thread error\n";
                     exit(0);
