@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
-#include<cstring>
+#include<string.h>
 #include<netinet/in.h>//struct_sockadds_in结构体的定义
 #include<sys/socket.h>//套接字接口
 #include<arpa/inet.h>//一些字节序装换的接口
