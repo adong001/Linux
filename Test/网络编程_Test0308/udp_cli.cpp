@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<unistd.h>
 #include<cstring>
+#include<iostream>
 #include<netinet/in.h>//struct_sockadds_in结构体的定义
 #include<sys/socket.h>//套接字接口
 #include<arpa/inet.h>//一些字节序装换的接口
@@ -12,6 +13,90 @@
  * 4.发送数据
  * 5.关闭套接字
  * */
+
+class UdpSocket
+{
+    private:
+        int m_sockfd;
+    public:
+        //1.创建套接字
+        bool Socket()
+        {
+            m_sockfd = socket(AF_INET,SOCK_STREAM,IPPROTO_UDP);
+            if(m_sockfd < 0 )
+            {
+                perror("socket error:");
+                return false;
+            }
+            return true;
+        }
+
+
+        void Addr(struct sockaddr_in* addr,const std::string& ip,const uint16_t port)
+        {
+            addr->sin_family = AF_INET;
+            addr->sin_port = htons(port);
+            inet_pton(AF_INET,ip.c_str(),&addr->sin_addr.s_addr);
+        }
+
+        //2.绑定地址信息
+        bool Bind(const std::string& ip,const uint16_t port)
+        {
+            struct sockaddr_in* addr;
+            Addr(addr,ip,port);
+            socklen_t len = sizeof(struct sockaddr_in);
+            
+            int ret = bind(m_sockfd,(struct sockaddr*)&addr,len);
+            if(ret < 0)
+            {
+                perror("bind error:");
+                return false;
+            }
+
+            return true;
+
+        }
+        //3.接收数据
+        bool Send(const std::string& data,const std::string& ip,const uint16_t port)
+        {
+            struct sockaddr_in addr;
+            socklen_t len = sizeof(struct sockaddr_in);
+            Addr(&addr,ip,port);
+
+            //int sendto(套接字描述符,数据,数据长度,选项,对端信息首地址,对端信息长度)
+            int ret = sendto(m_sockfd,data.c_str(),data.size(),0,(struct sockaddr*)&addr,len);
+            if(ret < 0)
+            {
+                perror("sendto error:");
+                return false;
+            }
+            return true;
+        }
+
+        //4.接收数据
+        bool Recv(std::string* buff,std::string* dest_ip = NULL,uint16_t* dest_port)
+        {
+            char tmp[4096] = {0};
+            struct sockaddr_in addr;
+            socklen_t len = sizeof(struct sockaddr_in);
+
+            //int recvfrom(套接字描述符,接收缓冲区,指定缓冲区大小,选项,d对端地址缓冲区,对端缓冲区长度)
+            int ret = recvfrom(m_sockfd,tmp,4096,0,(struct sockaddr*)&addr,&len);
+            if(ret < 0)
+            {
+                perror("recvfrom error:");
+                return false;
+            }
+            
+            buff->assign(tmp,ret);//给buff开辟ret长度的空间,将tmp中ret个空间
+            if(dest_ip != NULL)
+            {
+                *de
+            }
+            return true;
+        }
+};
+
 
 int main(int argc,char* argv[])
 {
