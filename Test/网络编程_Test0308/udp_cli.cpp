@@ -23,7 +23,7 @@ class UdpSocket
         //1.创建套接字
         bool Socket()
         {
-            m_sockfd = socket(AF_INET,SOCK_STREAM,IPPROTO_UDP);
+            m_sockfd = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
             if(m_sockfd < 0 )
             {
                 perror("socket error:");
@@ -115,12 +115,12 @@ int main(int argc,char* argv[])
 {
     if(argc != 3)//通过参数传入服务端要绑定的地址信息
     {
-        printf("em:./udp_srv 192.168.178.1 123456\n");
+        printf("em:./udp_srv 192.168.178.129 12345\n");
         return -1;
     }
 
-    //通过./udp_srv 192.168.178.1 123456来运行程序
-    //argc[0]--./udp_srv  argv[1]--192.168.178.1  argv[2]--123456
+    //通过./udp_srv 192.168.178.129来运行程序
+    //argc[0]--./udp_srv  argv[1]--192.168.178.129  argv[2]--12345
     
     std::string ip = argv[1];
     uint16_t port = atoi(argv[2]);

@@ -17,12 +17,12 @@ int main(int argc,char* argv[])
 {
     if(argc != 3)//通过参数传入服务端要绑定的地址信息
     {
-        printf("em:./udp_srv 192.168.178.1 123456\n");
+        printf("em:./udp_srv 192.168.178.129 12345\n");
         return -1;
     }
 
-    //通过./udp_srv 192.168.178.1 123456来运行程序
-    //argc[0]--./udp_srv  argv[1]--192.168.178.1  argv[2]--123456
+    //通过./udp_srv 192.168.178.129来运行程序
+    //argc[0]--./udp_srv  argv[1]--192.168.178.129  argv[2]--12345
     const char* ip_addr= argv[1];//分别获取IP地址和端口数据
     uint16_t port_addr = atoi(argv[2]);
 
@@ -117,4 +117,5 @@ int main(int argc,char* argv[])
     
     close(sockfd);
     return 0;
-}
+};
+
