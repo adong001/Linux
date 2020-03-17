@@ -58,6 +58,7 @@ int main(int argc,char* argv[])
                     continue;//接收数据失败,重新接收
                 }
 
+                printf("client say:%s\n",buff.c_str());
                 std::cout<<"server say:";
                 buff.clear();
                 std::cin>>buff;

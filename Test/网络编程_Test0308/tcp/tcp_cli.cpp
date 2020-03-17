@@ -1,6 +1,11 @@
 #include<iostream>
-#include<stdlib.h>
+#include<signal.h>
 #include"TcpSocket.hpp"
+
+void sigcb(int signo)
+{
+    printf("服务器断开连接\n");
+}
 
 int main(int argc,char* argv[])
 {
@@ -10,6 +15,7 @@ int main(int argc,char* argv[])
         return -1;
     }
 
+    signal(SIGPIPE,sigcb);
     //argv[0]--./tcp_cli  argv[1]--IP地址  argv[2]--Potr端口号
     const std::string ip = argv[1];
     const uint16_t port = atoi(argv[2]);
@@ -31,6 +37,7 @@ int main(int argc,char* argv[])
         CHECK_RET(cli_sock.Recv(&buff));
         std::cout << "server say:"<< buff << std::endl;
     }
+
     cli_sock.Close();
     return 0;
 }

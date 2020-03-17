@@ -1,3 +1,4 @@
+#include<stdlib.h>
 #include<stdio.h>                            
 #include<unistd.h>    
 #include<string>  
@@ -6,7 +7,7 @@
 #include<arpa/inet.h>//一些字节序装换的接口
 
 #define BACKLOG 10 //同一时间最大连接数
-#define CHECK_RET(q) if((q)==false){return -1;}
+#define CHECK_RET(q) if((q)==false){return -1;}//判断TcpSocket封装的函数是否调用成功
 
 class TcpSocket
 {
@@ -28,7 +29,7 @@ class TcpSocket
         //1.创建套接字
         bool Socket()
         {
-            m_sockfd = socket(AF_INET,SOCK_DGRAM,IPPROTO_TCP);
+            m_sockfd = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
             if(m_sockfd < 0)
             {
                 perror("socket error:");

@@ -91,7 +91,7 @@ int main(int argc,char* argv[])
         uint16_t cli_port = ntohs(cliaddr.sin_port);//将网络字节序端口转换为字符串端口
         inet_ntop(AF_INET,&cliaddr.sin_addr,cli_ip,32);//按照IPV4标准将网络字节序IP地址转换成字符串IP地址
 
-        printf("client[%s:%d]say:%s\n",cli_ip,cli_port);
+        printf("client[%s:%d]say:%s\n",cli_ip,cli_port,buff);
 
         printf("server say:");
         fflush(stdout);
