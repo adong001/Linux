@@ -26,6 +26,15 @@ class TcpSocket
             m_sockfd(sockfd)
         {}
 
+        void SetFd(int fd)
+        {
+            m_sockfd = fd;
+        }
+
+        int GetFd()
+        {
+            return m_sockfd;
+        }
         //1.创建套接字
         bool Socket()
         {

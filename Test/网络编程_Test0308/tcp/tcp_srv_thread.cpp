@@ -2,14 +2,48 @@
 #include<signal.h>
 #include<sys/wait.h>
 #include<iostream>
+#include<pthread.h>
 
-
-void sigcb(int signo)
+void *thread_start(void* arg)//线程入口函数
 {
-    //WNOHANG---非阻塞操作
-    //返回值-- >0(表示有子进程退出)  <=0 (没有子进程退出)
-    //SIGCHLD是一个不可靠信号，因此采用循环处理
-    while(waitpid(-1,NULL,WNOHANG) > 0);
+    long sockfd = (long)arg;
+
+    TcpSocket com_sock;
+    com_sock.SetFd(sockfd);
+
+    while(1)
+    {
+        if(sockfd < 0)
+        {
+            printf("connection break\n");
+            pthread_exit(NULL);//每次检查连接是否断开,客户端断开就会关闭客户端套接字，m_sockfd = -1
+            return NULL;
+        }
+        std::string buff;
+    
+        bool ret = com_sock.Recv(&buff);
+        if(ret== false)
+        {
+            sleep(1);
+            com_sock.Close();
+            continue;//接收数据失败,重新接收
+        }
+
+        printf("client say:%s\n",buff.c_str());
+        std::cout<<"server say:";
+        buff.clear();
+        std::cin>>buff;
+
+        ret = com_sock.Send(buff);
+        if(ret == false)
+        {
+            com_sock.Close();
+            continue;//发送失败，重新发送
+        }
+    }
+    com_sock.Close();
+    return NULL;
+
 }
 
 int main(int argc,char* argv[])
@@ -19,8 +53,6 @@ int main(int argc,char* argv[])
         std::cout << "em: ./tcp_scv host_ip host_port\n";
         return -1;
     }
-
-    signal(SIGCHLD,sigcb);//对SIGCLD信号自定义处理,等到子进程退出后释放资源,避免父进程一直死等子进程退出
 
     const std::string ip = argv[1];
     const uint16_t port = atoi(argv[2]);
@@ -39,41 +71,16 @@ int main(int argc,char* argv[])
         bool ret = listen_sock.Accept(&com_sock,&cli_ip,&cli_port);
         if(ret == false)
         {
+            printf("waiting connect!!!");
+            sleep(1);
             continue;//服务端不会一次接收客户端失败而退出
         }
 
         std::cout << "new connection[" << cli_ip.c_str()<<":"<<cli_port<<"]\n";
 
-        pid_t pid = fork();//创建子进程
-        if(pid == 0)
-        {
-            while(1)
-            {
-                //每个子进程负责和对应的客户进程通信
-                std::string buff;
-                ret = com_sock.Recv(&buff);
-                if(ret== false)
-                {
-                    com_sock.Close();
-                    continue;//接收数据失败,重新接收
-                }
-
-                std::cout<<"server say:";
-                buff.clear();
-                std::cin>>buff;
-
-                ret = com_sock.Send(buff);
-                if(ret == false)
-                {
-                    com_sock.Close();
-                    continue;//发送失败，重新发送
-                }
-            }
-            com_sock.Close();
-            exit(0);//子进程结束，关闭套接字
-        }
-        com_sock.Close();
-        //父子进程独有一份通信套接字,子进程与对应的客户端通信结束后，退出时父进程也要关闭对应的套接字
+        pthread_t tid;
+        pthread_create(&tid,NULL,thread_start,(void*)(com_sock.GetFd()));
+        pthread_detach(tid);
     }
     listen_sock.Close();
     return 0;
