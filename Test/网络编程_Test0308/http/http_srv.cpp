@@ -10,8 +10,8 @@ int main(int argc,char* argv[])
         return -1;
     }
 
-    const std::string ip = argv[1];
-    const uint16_t port = atoi(argv[2]);
+    std::string ip = argv[1];
+    uint16_t port = atoi(argv[2]);
 
     TcpSocket listen_sock;//监视套接字,这个对象只负责客户端连接时创建新的套接字
     CHECK_RET(listen_sock.Socket());//创建套接字
@@ -22,7 +22,7 @@ int main(int argc,char* argv[])
     {
         TcpSocket com_sock;//通信套接字,只负责和相应的客户端进行通信
 
-        bool ret = listen_sock.Accept(&com_sock);
+        bool ret = listen_sock.Accept(&com_sock,&ip,&port);
         if(ret == false)
         {
             continue;//服务端不会一次接收客户端失败而退出
