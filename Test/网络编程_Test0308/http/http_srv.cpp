@@ -1,6 +1,7 @@
 #include"TcpSocket.hpp"
 #include<sstream>
 #include<iostream>
+#include<fstream>
 
 int main(int argc,char* argv[])
 {
@@ -38,7 +39,20 @@ int main(int argc,char* argv[])
         header << "Content-Length:" << "body.size()" << "\r\n";
         header << "Content-Type: text/html\r\n";
        // header << "Location:http://www.baidu.com/\r\n";
-        std::string body = "<html><head><title>这是一个HTML页面</title></head><body><h1>Hello World</h1></body></html>";
+       //
+     
+        std::string body = "<html><body><div id=\"header\"><h1>我是小丹丹~~</h1></div><div id=\"header\"><h1>最爱看黄片~~</h1></d:iv></body></html>";
+        /*body.resize(4096);
+        std::ifstream ifs("html.txt",std::ifstream::binary);
+        ifs.read((char*)body.c_str(),4096);
+        while(!ifs.eof())
+        {
+            
+            ifs.read(tmp,1024);
+            int readnum = ifs.gcount();
+            body.insert(tmp,tmp+readnum);
+        }
+        */
         
         com_sock.Send(FirstBalck);
         com_sock.Send(header.str());
