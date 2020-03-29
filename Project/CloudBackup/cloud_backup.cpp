@@ -4,7 +4,6 @@ void compress_test(char* argv[])
 {
     //argv[1]---源文件名称
     //argv[2]---压缩包名称
-    
     Cloud_Sys::CompressTool::Compress(argv[1],argv[2]);
     std::string file = argv[2];
     file += ".txt";
@@ -49,7 +48,6 @@ void HotPot_test()
     NonHotPotCompress ncom(GZFILLE_DIR,BACKUP_DIR);
     ncom.Start();
     return ;
-    
 }
 
 int main(int argc, char* argv[])
