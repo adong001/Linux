@@ -19,10 +19,11 @@ void helloworld(const httplib::Request& req,httplib::Response& rsp)
     return;
 }
 
-int main(int argc,char* argv[])
+int main()
 {
     httplib::Server server;
     server.Get("/",helloworld);
-    server.listen(argv[1],argv[2]);
+    server.listen("0.0.0.0",9000);//监听本机所有IP地址
     return 0;
+
 }

@@ -13,9 +13,9 @@
 
 #define NOHOT_TIME 10 //非热点文件最后一次访问时间在10s以外
 #define INTERVAL_TIME 30 //非热点文件的检测每隔30s检测一次
-#define BACKUP_DIR "./backupfile" //备份文件路径
-#define GZFILLE_DIR  "./gzfile" //文件压缩路径
-#define DATA_FILE "./list_backup" //数据管理模块的数备份文件名称
+#define BACKUP_DIR "./backupfile/" //备份文件路径
+#define GZFILLE_DIR  "./gzfile/" //文件压缩路径
+#define DATA_FILE "./list_backup/" //数据管理模块的数备份文件名称
 
 
 namespace Cloud_Sys
@@ -134,41 +134,6 @@ namespace Cloud_Sys
     };
 
 
-    class Server//服务器类
-    {
-        private:
-            std::string m_file_dir;//上传文件备份路径
-            httplib::Server m_server;//实例化httplib库提供的Server对象,便于实现http协议
-            static void FileUpLoad(const httplib::Request& req,httplib::Response& rsp)//文件上传处理回调函数
-            {
-                rsp.status = 200;
-                rsp.set_content("upload",6,"text/html");
-            }
-            static void FileList(const httplib::Request& req,httplib::Response& rsp)//文件列表处理回调函数
-            {
-                rsp.status = 200;
-                rsp.set_content("list",4,"text/html");
-
-            }
-            static void FileDownLoad(const httplib::Request& req,httplib::Response& rsp)//文件下载处理回调函数
-            {
-                rsp.status = 200;
-                std::string path = req.matches[1];
-                rsp.set_content(path.c_str(),path.size(),"text/html");
-
-            }
-        public:
-            bool Start()
-            {
-                m_server.Put("/upload",FileUpLoad);
-                m_server.Get("/list",FileList);
-                m_server.Get("/download/(.*)",FileDownLoad);
-                m_server.listen("0.0.0.0",9000);
-                return true;
-
-            }
-            
-    };
 
     class DataManage//数据管理类
     {
@@ -239,6 +204,16 @@ namespace Cloud_Sys
                 return true;
             }
 
+            bool GetGzName(const std::string&src,std::string& det)//通过源文件获取压缩包名称
+            {
+                auto it = m_file_list.find(src);
+                if(it == m_file_list.end())
+                {
+                    return false;
+                }
+                det = it->second;
+                return true;
+            }
 
             bool Insert(const std::string& file_src,const std::string& file_det)//插入或更新数据
             {
@@ -313,9 +288,9 @@ namespace Cloud_Sys
             }
     };
 
-
 };
 Cloud_Sys::DataManage data_manage(DATA_FILE);
+
 class NonHotPotCompress//非热点压缩类
 {
     private:
@@ -345,7 +320,7 @@ class NonHotPotCompress//非热点压缩类
         NonHotPotCompress(const std::string& bu_dir,const std::string& gz_dir):
             m_bu_dir(bu_dir),
             m_gz_dir(gz_dir)
-       {}
+    {}
         bool Start()//总体向外提供的功能接口,开始压缩模块
         {
             //不断循环判断有没有非热点文件
@@ -354,7 +329,7 @@ class NonHotPotCompress//非热点压缩类
                 //1.获取未压缩文件列表
                 std::vector<std::string> list;        
                 data_manage.GetNoncompressList(&list);
-                
+
                 //2.逐个判断这个文件是否是非热点文件
                 for(int i = 0; i < list.size();i++ )
                 {
@@ -365,8 +340,8 @@ class NonHotPotCompress//非热点压缩类
                         std::string d_filename = list[i] + ".gz";//不带路径的压缩包名称
                         std::string src_name = m_bu_dir + s_filename;
                         std::string det_name = m_gz_dir + d_filename;
-                 //3.是非热点文件就压缩，并删除源文件
-                
+                        //3.是非热点文件就压缩，并删除源文件
+
                         if(Cloud_Sys::CompressTool::Compress(src_name,det_name) == true)
                         {
                             data_manage.Insert(s_filename,d_filename);//更新数据
@@ -379,9 +354,79 @@ class NonHotPotCompress//非热点压缩类
                     }
                 }
 
-                    //4.休眠一会
-                    sleep(INTERVAL_TIME);
+                //4.休眠一会
+                sleep(INTERVAL_TIME);
             }
             return true;
         }
+};
+
+class Server//服务器类
+{
+    private:
+        std::string m_file_dir;//上传文件备份路径
+        httplib::Server m_server;//实例化httplib库提供的Server对象,便于实现http协议
+
+        static void FileUpLoad(const httplib::Request& req,httplib::Response& rsp)//文件上传处理回调函数
+        {
+            std::string filename = req.matches[1];//matches[1]为正则表达式后面捕捉道德字符串
+            std::string pathname = BACKUP_DIR + filename;//文件备份在指定路径下
+            Cloud_Sys::FileTool::Write(pathname,req.body);//向文件写入数据
+            data_manage.Insert(filename,filename);//添加文件信息到数据管理模块
+            rsp.status = 200;//上传成功状态码为200
+            return ;
+        }
+        static void FileList(const httplib::Request& req,httplib::Response& rsp)//文件列表处理回调函数
+        {
+            std::vector<std::string> list;
+            data_manage.GetNoncompressList(&list);
+            std::stringstream tmp;
+            tmp<<"<html><body><hr />";
+            for(int i = 0;i < list.size();i++)
+            {
+                tmp<< "a href='download/'" << list[i] <<";'>"<<list[i] << "</a>";
+                tmp << "<hr />";
+            }
+            tmp << "<hr /></body></html>";
+            rsp.set_content(tmp.str().c_str(),tmp.str().size(),"text/html");
+            rsp.status = 200;
+        }
+        static void FileDownLoad(const httplib::Request& req,httplib::Response& rsp)//文件下载处理回调函数
+        {
+            //1.判断文件是否存在
+            std::string filename = req.matches[1];//这就是前面捕捉到的(.*)
+            if(data_manage.Exit(filename) == false)
+            {
+                rsp.status = 404;//访问文件不存在
+                return;
+            }
+
+            //2.判断文件是否压缩
+            std::string pathname = BACKUP_DIR + filename;
+            if(data_manage.IsCompress(filename))
+            {
+                //文件被压缩，解压它
+                std::string gzfile; 
+                data_manage.GetGzName(filename,gzfile);//获取压缩包名称
+                std::string gzpathname = GZFILLE_DIR + gzfile;//压缩包路径
+                Cloud_Sys::CompressTool::DeCompress(gzpathname,pathname);//将压缩包解压
+                unlink(gzpathname.c_str());//删除压缩包
+            }
+            
+            //3.从文件读取数据,响应给客户端
+            Cloud_Sys::FileTool::Read(pathname,rsp.body);
+            rsp.set_header("Content-Type","application/octet-stream");//二进制下载流
+            rsp.status = 200;
+        }
+    public:
+        bool Start()
+        {
+            m_server.Put("/(.*)",FileUpLoad);
+            m_server.Get("/list",FileList);
+            m_server.Get("/download/(.*)",FileDownLoad);
+            m_server.listen("0.0.0.0",9000);
+            return true;
+
+        }
+
 };

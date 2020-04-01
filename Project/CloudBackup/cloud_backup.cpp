@@ -45,7 +45,7 @@ void DataManage_test2()
 
 void HotPot_test()
 {
-    NonHotPotCompress ncom(GZFILLE_DIR,BACKUP_DIR);
+    NonHotPotCompress ncom(BACKUP_DIR,GZFILLE_DIR);
     ncom.Start();
     return ;
 }
@@ -53,10 +53,12 @@ void HotPot_test()
 int main(int argc, char* argv[])
 {
 
-    //compress_test(argv);
-     DataManage_test();
-     DataManage_test2();
-   /* if(boost::filesystem::exists(GZFILLE_DIR) == false)
+    //compress_test(argv);//文件压缩模块测试
+    // DataManage_test(); //数据管理模块测试
+    // DataManage_test2();
+    
+    //热点文件检测模块测试 
+    if(boost::filesystem::exists(GZFILLE_DIR) == false)
     {
         boost::filesystem::create_directory(GZFILLE_DIR);
     }
@@ -69,5 +71,5 @@ int main(int argc, char* argv[])
     std::thread thr(HotPot_test);
 
     thr.join();
-   */ return 0;
+    return 0;
 }
