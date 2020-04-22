@@ -50,7 +50,7 @@ class Select
             tv.tv_sec = mtimeout / 1000;//微秒
             tv.tv_usec= (mtimeout % 1000) / 1000;//毫秒
 
-            fd_set tmp_rfds = m_rfds;//写读IO集合
+            fd_set tmp_rfds = m_rfds;//写IO集合,select后会改变m_rfds,返回时会将未就绪的描述符移除
             int nfds = select(m_maxfd + 1, &tmp_rfds,NULL, NULL, &tv);
 
             if(nfds < 0)//监控出错
