@@ -6,7 +6,7 @@
 #include<netinet/in.h>//struct_sockadds_in结构体的定义    
 #include<sys/socket.h>//套接字接口    
 #include<arpa/inet.h>//一些字节序装换的接口
-
+#include<iostream>
 #define BACKLOG 10 //同一时间最大连接数
 #define CHECK_RET(q) if((q)==false){return -1;}//判断TcpSocket封装的函数是否调用成功
 
