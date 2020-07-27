@@ -17,7 +17,7 @@ void DataManage_test()
     data_manage.Insert("c.txt","c.txt");
     data_manage.Insert("d.txt","d.txt.gz");
     data_manage.Insert("e.txt","e.txt.gz");
-    data_manage.Stroage();
+    data_manage.Storage();
 }
 
 void DataManage_test2()
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
     //DataManage_test(); //数据管理模块插入数据测试
     // DataManage_test2();//数据管理模块初始化，获取文件信息测试
     
-    //热点文件检测模块测试 
+    //源文件目录和压缩文件目录的创建
     if(boost::filesystem::exists(GZFILLE_DIR) == false)
     {
         boost::filesystem::create_directory(GZFILLE_DIR);
@@ -76,8 +76,8 @@ int main(int argc, char* argv[])
     }
 
     //data_manage.Insert("Test","Test");
-    std::thread thr_HotPot(Thr_NonHotPotFile_Monitor_Compress);
-    std::thread thr_server(Thr_Http_Server);
+    std::thread thr_HotPot(Thr_NonHotPotFile_Monitor_Compress);//非热点文件监测线程
+    std::thread thr_server(Thr_Http_Server);//网络服务器线程
     thr_HotPot.join();
     thr_server.join();
     return 0;

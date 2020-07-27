@@ -218,6 +218,7 @@ namespace Cloud_Sys
             {
                 pthread_rwlock_wrlock(&m_rwlock);
                 m_file_list[file_src] = file_det;
+                Storage();
                 pthread_rwlock_unlock(&m_rwlock);
                 return true;
 
@@ -236,7 +237,7 @@ namespace Cloud_Sys
             }
 
 
-            bool Stroage()//数据改变后持久化存储，将m_file_list中的数据持久化存储
+            bool Storage()//数据改变后持久化存储，将m_file_list中的数据持久化存储
             {
                 pthread_rwlock_rdlock(&m_rwlock);
                 std::stringstream tmp;
@@ -332,7 +333,7 @@ class NonHotPotCompress//非热点压缩类
                 //2.逐个判断这个文件是否是非热点文件
                 for(int i = 0; i < list.size();i++ )
                 {
-                    bool ret = IsHotPotFile(list[i]);
+                    bool ret = IsHotPotFile(m_bu_dir + list[i]);
                     if(ret == false)
                     {
                         std::string s_filename = list[i];//不带路径的源文件名称
@@ -345,6 +346,7 @@ class NonHotPotCompress//非热点压缩类
                         {
                             data_manage.Insert(s_filename,d_filename);//更新数据
                             unlink(src_name.c_str());//删除源文件
+                            std::cout << s_filename << " is compressed\n";
                         }
                         else
                         {
