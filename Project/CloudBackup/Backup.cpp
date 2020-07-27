@@ -43,21 +43,28 @@ void DataManage_test2()
 
 }
 
-void HotPot_test()
+void Thr_NonHotPotFile_Monitor_Compress()//非热点文件检测压缩模块线程
 {
     NonHotPotCompress ncom(BACKUP_DIR,GZFILLE_DIR);
     ncom.Start();
     return ;
 }
 
+void Thr_Http_Server()//网络服务端模块线程
+{
+    Server server;
+    server.Start();
+    return;
+}
+
 int main(int argc, char* argv[])
 {
 
     //compress_test(argv);//文件压缩模块测试
-    //DataManage_test(); //数据管理模块测试
-     DataManage_test2();
+    //DataManage_test(); //数据管理模块插入数据测试
+    // DataManage_test2();//数据管理模块初始化，获取文件信息测试
     
-    /*热点文件检测模块测试 
+    //热点文件检测模块测试 
     if(boost::filesystem::exists(GZFILLE_DIR) == false)
     {
         boost::filesystem::create_directory(GZFILLE_DIR);
@@ -67,9 +74,11 @@ int main(int argc, char* argv[])
     {
         boost::filesystem::create_directory(BACKUP_DIR);
     }
-    data_manage.Insert("Test","Test");
-    std::thread thr(HotPot_test);
 
-    thr.join();
-    */return 0;
+    //data_manage.Insert("Test","Test");
+    std::thread thr_HotPot(Thr_NonHotPotFile_Monitor_Compress);
+    std::thread thr_server(Thr_Http_Server);
+    thr_HotPot.join();
+    thr_server.join();
+    return 0;
 }

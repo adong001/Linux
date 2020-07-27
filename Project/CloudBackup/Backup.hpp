@@ -10,7 +10,7 @@
 #include<pthread.h>
 #include<boost/algorithm/string.hpp>
 #include<boost/filesystem.hpp>
-#define NOHOT_TIME 10 //非热点文件最后一次访问时间在10s以外
+#define NOHOT_TIME 30 //非热点文件最后一次访问时间在10s以外
 #define INTERVAL_TIME 30 //非热点文件的检测每隔30s检测一次
 #define BACKUP_DIR "./backupfile/" //备份文件路径
 #define GZFILLE_DIR  "./gzfile/" //文件压缩路径
@@ -365,13 +365,13 @@ class Server//服务器类
     private:
         std::string m_file_dir;//上传文件备份路径
         httplib::Server m_server;//实例化httplib库提供的Server对象,便于实现http协议
-
         static void FileUpLoad(const httplib::Request& req,httplib::Response& rsp)//文件上传处理回调函数
         {
             std::string filename = req.matches[1];//matches[1]为正则表达式后面捕捉道德字符串
             std::string pathname = BACKUP_DIR + filename;//文件备份在指定路径下
             Cloud_Sys::FileTool::Write(pathname,req.body);//向文件写入数据
             data_manage.Insert(filename,filename);//添加文件信息到数据管理模块
+            std::cout << filename <<" Uploaded\n";
             rsp.status = 200;//上传成功状态码为200
             return ;
         }
@@ -410,6 +410,7 @@ class Server//服务器类
                 std::string gzpathname = GZFILLE_DIR + gzfile;//压缩包路径
                 Cloud_Sys::CompressTool::DeCompress(gzpathname,pathname);//将压缩包解压
                 unlink(gzpathname.c_str());//删除压缩包
+                data_manage.Insert(filename,filename);//删除压缩包后更新数据管理模块
             }
             
             //3.从文件读取数据,响应给客户端
