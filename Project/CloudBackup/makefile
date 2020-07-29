@@ -5,3 +5,4 @@ srv:srv.cpp
 	g++ -std=c++11 $^ -o $@ -lpthread -lboost_system -lboost_filesystem
 clean:
 	rm -rf backupfile gzfile list_backup
+	touch list_backup

@@ -10,8 +10,8 @@
 #include<pthread.h>
 #include<boost/algorithm/string.hpp>
 #include<boost/filesystem.hpp>
-#define NOHOT_TIME 30 //非热点文件最后一次访问时间在10s以外
-#define INTERVAL_TIME 30 //非热点文件的检测每隔30s检测一次
+#define NOHOT_TIME 5 //非热点文件最后一次访问时间在10s以外
+#define INTERVAL_TIME 5 //非热点文件的检测每隔30s检测一次
 #define BACKUP_DIR "./backupfile/" //备份文件路径
 #define GZFILLE_DIR  "./gzfile/" //文件压缩路径
 #define DATA_FILE "./list_backup" //数据管理模块的数备份文件名称
@@ -100,6 +100,7 @@ namespace Cloud_Sys
                     }
                     len += ret;
                 }
+                std::cout << file_src <<" is compressed to " << file_det <<std::endl;
                 gzclose(gf);
                 return true;
             }
@@ -127,6 +128,7 @@ namespace Cloud_Sys
                 {
                     ofs.write(buff,ret);
                 }
+                std::cout << file_src <<" is decompressed to " << file_det <<std::endl;
                 ofs.close();
                 gzclose(gf);
             }
@@ -380,12 +382,11 @@ class Server//服务器类
         static void FileList(const httplib::Request& req,httplib::Response& rsp)//文件列表处理回调函数
         {
             std::vector<std::string> list;
-            data_manage.GetNoncompressList(&list);
+            data_manage.GetAllFileName(&list);//获取文件管理模块中的所有文件信息
             std::stringstream tmp;
             tmp<<"<html><body><hr />";
             for(int i = 0;i < list.size();i++)
             {
-                tmp << "<h2>hello world</h2>";
                 tmp<< "<a href='download/" << list[i] <<"'>"<<list[i] << "</a>";
                 tmp << "<hr />";
             }
@@ -398,6 +399,8 @@ class Server//服务器类
         {
             //1.判断文件是否存在
             std::string filename = req.matches[1];//这就是前面捕捉到的(.*)
+            if(data_manage.Exit(filename) == false)
+            {
                 rsp.status = 404;//访问文件不存在
                 return;
             }
@@ -414,10 +417,41 @@ class Server//服务器类
                 unlink(gzpathname.c_str());//删除压缩包
                 data_manage.Insert(filename,filename);//删除压缩包后更新数据管理模块
             }
-            
             //3.从文件读取数据,响应给客户端
             Cloud_Sys::FileTool::Read(pathname,rsp.body);
-            rsp.set_header("Content-Type","application/octet-stream");//二进制下载流
+            std::vector<std::string> Content_Type = { "application/octet-stream", //二进制流数据（如常见的文件下载）
+                                            "application/pdf",          //pdf格式
+                                            "application/msword",       //word格式
+                                            "image/jpeg",               //jpg个数
+                                            "image/png",                //png格式
+                                            "image/gif"};               //gif格式
+            size_t pos = filename.find(".");
+            std::string Type(filename.begin() + pos + 1,filename.end());//获取待下载文件格式
+            if(Type == "cpp" || Type == "txt" || Type == "h" || Type == "hpp")
+            {
+                Type = Content_Type[0];
+            }
+            else if(Type == "pdf")
+            {
+                Type = Content_Type[1];
+            }
+            else if(Type == "docx" || Type == "doc")
+            {
+                Type = Content_Type[2];
+            }
+            else if(Type == "jpg")
+            {
+                Type = Content_Type[3];
+            }
+            else if(Type == "png")
+            {
+                Type = Content_Type[4];
+            }
+            else if(Type == "gif")
+            {
+                Type = Content_Type[5];
+            }
+            rsp.set_header("Content-Type",Type);//二进制下载流
             rsp.status = 200;
         }
     public:

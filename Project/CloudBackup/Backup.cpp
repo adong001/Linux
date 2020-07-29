@@ -75,6 +75,7 @@ int main(int argc, char* argv[])
         boost::filesystem::create_directory(BACKUP_DIR);
     }
 
+    data_manage.InitLoad();//初始化数据管理模块
     //data_manage.Insert("Test","Test");
     std::thread thr_HotPot(Thr_NonHotPotFile_Monitor_Compress);//非热点文件监测线程
     std::thread thr_server(Thr_Http_Server);//网络服务器线程
