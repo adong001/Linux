@@ -218,8 +218,8 @@ namespace Cloud_Sys
             {
                 pthread_rwlock_wrlock(&m_rwlock);
                 m_file_list[file_src] = file_det;
-                Storage();
                 pthread_rwlock_unlock(&m_rwlock);
+                Storage();//插入数据后存储文件
                 return true;
 
             }
@@ -340,8 +340,8 @@ class NonHotPotCompress//非热点压缩类
                         std::string d_filename = list[i] + ".gz";//不带路径的压缩包名称
                         std::string src_name = m_bu_dir + s_filename;
                         std::string det_name = m_gz_dir + d_filename;
-                        //3.是非热点文件就压缩，并删除源文件
 
+                        //3.是非热点文件就压缩，并删除源文件
                         if(Cloud_Sys::CompressTool::Compress(src_name,det_name) == true)
                         {
                             data_manage.Insert(s_filename,d_filename);//更新数据
@@ -385,19 +385,19 @@ class Server//服务器类
             tmp<<"<html><body><hr />";
             for(int i = 0;i < list.size();i++)
             {
-                tmp<< "a href='download/'" << list[i] <<";'>"<<list[i] << "</a>";
+                tmp << "<h2>hello world</h2>";
+                tmp<< "<a href='download/" << list[i] <<"'>"<<list[i] << "</a>";
                 tmp << "<hr />";
             }
-            tmp << "<hr /></body></html>";
+            tmp << "</body></html>";
             rsp.set_content(tmp.str().c_str(),tmp.str().size(),"text/html");
             rsp.status = 200;
+            return;
         }
         static void FileDownLoad(const httplib::Request& req,httplib::Response& rsp)//文件下载处理回调函数
         {
             //1.判断文件是否存在
             std::string filename = req.matches[1];//这就是前面捕捉到的(.*)
-            if(data_manage.Exit(filename) == false)
-            {
                 rsp.status = 404;//访问文件不存在
                 return;
             }
