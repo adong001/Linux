@@ -11,7 +11,7 @@
 #include<boost/algorithm/string.hpp>
 #include<boost/filesystem.hpp>
 #define NOHOT_TIME 5 //非热点文件最后一次访问时间在10s以外
-#define INTERVAL_TIME 5 //非热点文件的检测每隔30s检测一次
+#define INTERVAL_TIME 30 //非热点文件的检测每隔30s检测一次
 #define BACKUP_DIR "./backupfile/" //备份文件路径
 #define GZFILLE_DIR  "./gzfile/" //文件压缩路径
 #define DATA_FILE "./list_backup" //数据管理模块的数备份文件名称
@@ -159,15 +159,16 @@ namespace Cloud_Sys
 
             bool Exit(const std::string& filename)//判断文件是否存在
             {
-                pthread_rwlock_unlock(&m_rwlock);//加读锁    
+                pthread_rwlock_rdlock(&m_rwlock);//加读锁    
                 for(auto it = m_file_list.begin();it != m_file_list.end();++it)
                 {
                     if(it->first == filename)//m_file_list的first存储的是源文件名称
                     {
-                        pthread_rwlock_destroy(&m_rwlock);
+                        pthread_rwlock_unlock(&m_rwlock);
                         return true;
                     }
                 }
+
                 pthread_rwlock_unlock(&m_rwlock);
                 return false;
             }
@@ -185,7 +186,7 @@ namespace Cloud_Sys
                         return true;
 
                     }
-                } 
+                }
                 pthread_rwlock_unlock(&m_rwlock);
                 return false;
             }
@@ -201,26 +202,32 @@ namespace Cloud_Sys
                         list->push_back(it->first);
                     }
                 }
+
                 pthread_rwlock_unlock(&m_rwlock);
                 return true;
             }
 
             bool GetGzName(const std::string&src,std::string& det)//通过源文件获取压缩包名称
             {
+                pthread_rwlock_rdlock(&m_rwlock);
                 auto it = m_file_list.find(src);
                 if(it == m_file_list.end())
                 {
                     return false;
                 }
+                pthread_rwlock_unlock(&m_rwlock);
                 det = it->second;
                 return true;
             }
 
             bool Insert(const std::string& file_src,const std::string& file_det)//插入或更新数据
             {
+                std::cout << "begin\n";
                 pthread_rwlock_wrlock(&m_rwlock);
+                std::cout << "wrlock\n";
                 m_file_list[file_src] = file_det;
                 pthread_rwlock_unlock(&m_rwlock);
+                std::cout <<"unlock\n";
                 Storage();//插入数据后存储文件
                 return true;
 
@@ -451,6 +458,7 @@ class Server//服务器类
             {
                 Type = Content_Type[5];
             }
+
             rsp.set_header("Content-Type",Type);//二进制下载流
             rsp.status = 200;
         }
