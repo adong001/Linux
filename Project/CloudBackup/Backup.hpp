@@ -215,23 +215,16 @@ namespace Cloud_Sys
                 {
                     return false;
                 }
-<<<<<<< HEAD
 		pthread_rwlock_unlock(&m_rwlock);
-=======
-                pthread_rwlock_unlock(&m_rwlock);
->>>>>>> 2ca6342f0361fcb74ff991e3cc35ad45c6719a6b
                 det = it->second;
                 return true;
             }
 
             bool Insert(const std::string& file_src,const std::string& file_det)//插入或更新数据
             {
-                std::cout << "begin\n";
                 pthread_rwlock_wrlock(&m_rwlock);
-                std::cout << "wrlock\n";
                 m_file_list[file_src] = file_det;
                 pthread_rwlock_unlock(&m_rwlock);
-                std::cout <<"unlock\n";
                 Storage();//插入数据后存储文件
                 return true;
 
