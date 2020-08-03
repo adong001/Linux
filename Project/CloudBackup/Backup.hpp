@@ -159,12 +159,12 @@ namespace Cloud_Sys
 
             bool Exit(const std::string& filename)//判断文件是否存在
             {
-                pthread_rwlock_unlock(&m_rwlock);//加读锁    
+                pthread_rwlock_rdlock(&m_rwlock);//加读锁    
                 for(auto it = m_file_list.begin();it != m_file_list.end();++it)
                 {
                     if(it->first == filename)//m_file_list的first存储的是源文件名称
                     {
-                        pthread_rwlock_destroy(&m_rwlock);
+                        pthread_rwlock_unlock(&m_rwlock);
                         return true;
                     }
                 }
@@ -207,11 +207,13 @@ namespace Cloud_Sys
 
             bool GetGzName(const std::string&src,std::string& det)//通过源文件获取压缩包名称
             {
+                pthread_rwlock_rdlock(&m_rwlock);
                 auto it = m_file_list.find(src);
                 if(it == m_file_list.end())
                 {
                     return false;
                 }
+		pthread_rwlock_unlock(&m_rwlock);
                 det = it->second;
                 return true;
             }
@@ -328,6 +330,12 @@ class NonHotPotCompress//非热点压缩类
             //不断循环判断有没有非热点文件
             while(1)
             {
+			    std::vector<std::string> ist;
+			        data_manage.GetAllFileName(&ist);  
+				    for(auto& e:ist)                      
+					        {                                   
+							            std::cout << e << std::endl;   
+								        }
                 //1.获取未压缩文件列表
                 std::vector<std::string> list;        
                 data_manage.GetNoncompressList(&list);

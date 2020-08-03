@@ -76,6 +76,12 @@ int main(int argc, char* argv[])
     }
 
     data_manage.InitLoad();//初始化数据管理模块
+    std::vector<std::string> list;
+    data_manage.GetAllFileName(&list);
+    for(auto& e:list)
+    {
+	    std::cout << e << std::endl;
+    }
     //data_manage.Insert("Test","Test");
     std::thread thr_HotPot(Thr_NonHotPotFile_Monitor_Compress);//非热点文件监测线程
     std::thread thr_server(Thr_Http_Server);//网络服务器线程
