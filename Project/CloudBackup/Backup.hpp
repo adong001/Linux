@@ -414,8 +414,8 @@ class Server//服务器类
                 data_manage.GetGzName(filename,gzfile);//获取压缩包名称
                 std::string gzpathname = GZFILLE_DIR + gzfile;//压缩包路径
                 Cloud_Sys::CompressTool::DeCompress(gzpathname,pathname);//将压缩包解压
-                unlink(gzpathname.c_str());//删除压缩包
                 data_manage.Insert(filename,filename);//删除压缩包后更新数据管理模块
+                unlink(gzpathname.c_str());//删除压缩包
             }
             //3.从文件读取数据,响应给客户端
             Cloud_Sys::FileTool::Read(pathname,rsp.body);
@@ -427,7 +427,8 @@ class Server//服务器类
                                             "image/gif"};               //gif格式
             size_t pos = filename.find(".");
             std::string Type(filename.begin() + pos + 1,filename.end());//获取待下载文件格式
-            if(Type == "cpp" || Type == "txt" || Type == "h" || Type == "hpp")
+	    std::cout << Type <<std::endl;
+	    if(Type == "cpp" || Type == "txt" || Type == "h" || Type == "hpp")
             {
                 Type = Content_Type[0];
             }
